@@ -202,7 +202,3 @@ This layered approach ensures that simple patterns are processed efficiently whi
 - Distributed inference support
 
 ---
-
-## Disclaimer
-
-This project is intended for research and educational purposes. Classification performance depends on dataset quality, model selection, and deployment hardware.
