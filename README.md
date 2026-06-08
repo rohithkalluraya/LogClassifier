@@ -46,37 +46,98 @@ This project implements a hybrid log classification system, combining three comp
    Make sure you have Python installed on your system. Install the required Python libraries by running the following command:
 
    ```bash
-   pip install -r requirements.txt
+   ```markdown
+
+   # Log Classification With Hybrid Classification Framework
+
+   This project implements a hybrid log classification system. It combines three complementary approaches to handle varying levels of complexity in log patterns so you can balance precision, latency, and cost.
+
+   ---
+
+   ## Classification Approaches
+
+   1. **Regular Expression (Regex)**: Handles simplified and predictable patterns using rule-based matching.
+
+   2. **Sentence Transformer + Logistic Regression**: Uses embeddings for more nuanced patterns when labeled data is available.
+
+   3. **LLM (Large Language Models)**: Provides flexible inference for ambiguous or poorly labeled logs when other methods are insufficient.
+
+   ![architecture](resources/arch.png)
+
+   ---
+
+   ## Folder Structure
+
+   1. **`training/`**: Code for training the sentence-transformer + logistic regression model and regex rules.
+
+   2. **`models/`**: Saved models and related artifacts.
+
+   3. **`resources/`**: Test CSVs, images, and other supporting assets.
+
+   4. **Root Directory**: Contains server and main scripts such as `server.py` and `classify.py`.
+
+   ---
+
+   ## Setup Instructions
+
+   1. **Install Dependencies**
+
+      ```bash
+      pip install -r requirements.txt
+      ```
+
+   2. **LLM Backend (Local LLaMA runtime)**
+
+      - This project supports using a local LLaMA-style runtime (via a Python wrapper such as `llamacpp-python` or another compatible runtime). If you choose a local runtime, make sure you have the runtime and a model file available.
+
+      - Example (model path and environment variables):
+
+        ```bash
+        export LLM_MODEL_PATH=/path/to/your/ggml-model.bin
+        export LLM_NUM_THREADS=4
+        # (Optional) export LLM_BACKEND=llamacpp
+        ```
+
+      - If `llamacpp-python` is available via pip on your system you can try:
+
+        ```bash
+        pip install llamacpp-python
+        ```
+
+      - Refer to the runtime's own installation instructions for GPU support, quantized models and platform-specific steps.
+
+   3. **Run the FastAPI Server**
+
+      ```bash
+      uvicorn server:app --reload
+      ```
+
+      - API: `http://127.0.0.1:8000/`
+      - Docs: `http://127.0.0.1:8000/docs`
+
+   ---
+
+   ## Usage
+
+   - Upload a CSV with columns: `source`, `log_message` to the classification endpoint.
+   - The output CSV will include a `target_label` column with predicted labels.
+
+   ### Configuration Notes
+
+   - **Backend selection**: The LLM inference component is implemented in `processor_llm.py`. To use the local LLaMA runtime, ensure the model path and any runtime-specific options are set (see `LLM_MODEL_PATH`, `LLM_NUM_THREADS`).
+   - **Performance**: Local runtimes trade off latency/throughput vs. cost and data privacy. For best results on CPU-only machines, use quantized models and adjust thread counts; for lower latency and higher throughput, use GPU-enabled runtimes or smaller models.
+
+   ---
+
+   ## Troubleshooting & Tips
+
+   - If inference is slow, try a smaller/quantized model and increase `LLM_NUM_THREADS`.
+   - For large-scale classification, prefer the sentence-transformer + logistic-regression pipeline or move LLM inference to a server with appropriate hardware.
+
+   ---
+
+   ## Disclaimer
+
+   This project is provided for educational purposes. Use in production requires appropriate licensing of models and verification of results.
+
    ```
-
-2. **Run the FastAPI Server**:
-   To start the server, use the following command:
-
-   ```bash
-   uvicorn server:app --reload
-   ```
-
-   Once the server is running, you can access the API at:
-   - `http://127.0.0.1:8000/` (Main endpoint)
-   - `http://127.0.0.1:8000/docs` (Interactive Swagger documentation)
-   - `http://127.0.0.1:8000/redoc` (Alternative API documentation)
-
----
-
-## Usage
-
-Upload a CSV file containing logs to the FastAPI endpoint for classification. Ensure the file has the following columns:
-- `source`
-- `log_message`
-
-The output will be a CSV file with an additional column `target_label`, which represents the classified label for each log entry.
-
----
-
-## Disclaimer
-
-**Copyrights Reserved**:  
-@Codebasics Inc  
-@LearnerX Pvt Ltd  
-
-This project, including its code and resources, is intended solely for educational purposes and should not be used for any commercial purposes without proper authorization.
